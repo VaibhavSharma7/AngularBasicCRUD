@@ -1,0 +1,134 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.js"></script>
+    <script src="../jsFiles/angular.min.js"></script>
+</head>
+<body ng-app="myApp" ng-controller="empcontroller">
+<br />
+<br />
+<table>
+    <tbody> <!-- This table is to enter data-->
+    <tr>
+        <td>Enter ID: </td><td>
+        <input type="text" ng-model="id"/></td>
+    </tr>
+    <tr>
+        <td>Enter Name: </td><td>
+        <input type="text" ng-model="name"/></td>
+    </tr>
+    <tr>
+        <td>Enter Designation: </td><td>
+        <input type="text" ng-model="desg"/></td>
+    </tr>
+    <tr>
+        <td><input type="button"
+                   ng-click="btnclk()" value="Save"/></td>
+        <td><input type="button"
+                   ng-click="btnupd(id,name,desg)" value="Update"/></td>
+    </tr>
+    </tbody>
+</table>
+<table> <!--This table is to display the data-->
+    <thead>
+    <tr>
+        <td>ID</td>
+        <td>Name</td>
+        <td>Designation</td>
+    </tr>
+    </thead>
+    <tbody ng-repeat="emp in emparr">
+    <tr>
+
+        <td ng-bind="emp.arr_id"></td>
+        <td ng-bind="emp.arr_name"></td>
+        <td ng-bind="emp.arr_desg"></td>
+        <td><input type="button"
+                   ng-click="edit(emp,emparr.indexOf(emp))" value="Edit"/></td>
+        <td><input type="button"
+                   ng-click="delete(emparr.indexOf(emp))" value="Delete"/></td>
+    </tr>
+    </tbody>
+</table>
+
+<div ng-controller="customersCtrl">
+<input type="button"
+       ng-click="getData()" value="Get Call"/>
+<ul>
+    <li ng-repeat="record in recordList">
+        {{ record }}
+    </li>
+</ul>
+</div>
+<script>
+    var app = angular.module('myApp', []);
+
+    //Controller 1
+        app.controller('empcontroller', ["$scope", function ($scope) {
+            $scope.emparr=[];
+
+        $scope.btnclk = function () {     //For Saving the Employee in memory
+            if (!$scope.id) {
+                alert("Enter ID");
+            }
+            else if (!$scope.name) {
+                alert("Enter Name");
+            }
+            else if (!$scope.desg) {
+                alert("Enter Designation");
+            }
+
+            else {
+                if(key!=null){
+                    alert("click update")
+                }
+                else{
+                $scope.emparr.push(
+                        { 'arr_id': $scope.id,
+                    'arr_name': $scope.name, 'arr_desg': $scope.desg }
+                );
+                $scope.id = '';
+                $scope.name = '';
+                $scope.desg = '';
+            }
+            }
+        };
+
+            var key;
+            $scope.edit = function (emp, indx) { //To edit the existing entry
+                key=indx
+                $scope.id = emp.arr_id;
+                $scope.name = emp.arr_name;
+                $scope.desg = emp.arr_desg;
+            };
+
+            $scope.btnupd = function (id, name, desg) {  //To update the existing entry
+                console.log("Value :: "+id)
+                $scope.emparr[key].arr_id = id;
+                $scope.emparr[key].arr_name = name;
+                $scope.emparr[key].arr_desg = desg;
+                $scope.id = '';
+                $scope.name = '';
+                $scope.desg = '';
+                key=null
+            };
+
+            $scope.delete = function (index) {  //To delete the existing entry
+                $scope.emparr.splice(index)
+            };
+
+    }])
+
+    //Controller 2 For hitting GET request and render JSON response from API.
+    app.controller('customersCtrl', function($scope, $http) {
+        $scope.getData=function()
+        {
+            console.log("came in")
+            $http.get("https://maps.googleapis.com/maps/api/place/textsearch/json?query=pizza+in+Noida&key=AIzaSyAtW3cJKs8_TAFnLYLg4mz-Ik9SKNtEkKM")
+                    .success(function (response) {
+                        $scope.recordList = response.records;
+                    });
+        };
+    });
+
+</script>
